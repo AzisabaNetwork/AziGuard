@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "net.azisaba"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
@@ -16,6 +16,9 @@ dependencies {
     // velocity-api
     compileOnly("com.velocitypowered:velocity-api:3.0.1")
     annotationProcessor("com.velocitypowered:velocity-api:3.0.1")
+
+    // netty
+    compileOnly("io.netty:netty-all:4.1.76.Final")
 }
 
 java {
