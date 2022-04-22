@@ -23,7 +23,6 @@ public class PacketLogHandler extends ChannelDuplexHandler {
 
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
-        super.channelRead(ctx, msg);
         if (AziGuardConfig.logPackets) {
             try {
                 String name = "Unmapped packet";
@@ -43,9 +42,10 @@ public class PacketLogHandler extends ChannelDuplexHandler {
                 } else {
                     PACKET_COUNT.put(name, 1L);
                 }
-            } catch (Exception e) {
+            } catch (Exception | LinkageError e) {
                 AziGuard.instance.getLogger().warn("Failed to count packet", e);
             }
         }
+        super.channelRead(ctx, msg);
     }
 }
