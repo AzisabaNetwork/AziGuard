@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 public class AziGuardConfig {
     public static boolean whitelist = false;
+    public static String whitelistNode = "aziguard.bypass_whitelist";
     public static boolean logPackets = false;
 
     public static void reload() {
@@ -26,6 +27,7 @@ public class AziGuardConfig {
                         configPath,
                         Arrays.asList(
                                 "whitelist: false",
+                                "whitelist-node: aziguard.bypass_whitelist",
                                 "logPackets: false"
                         ),
                         StandardOpenOption.CREATE
@@ -37,6 +39,7 @@ public class AziGuardConfig {
         try {
             ConfigurationNode node = YAMLConfigurationLoader.builder().setPath(configPath).build().load();
             whitelist = node.getNode("whitelist").getBoolean(false);
+            whitelistNode = node.getNode("whitelist-node").getString("aziguard.bypass_whitelist");
             logPackets = node.getNode("logPackets").getBoolean(false);
         } catch (IOException ignore) {
         }

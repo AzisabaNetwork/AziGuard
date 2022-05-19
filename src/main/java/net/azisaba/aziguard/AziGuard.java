@@ -70,7 +70,7 @@ public class AziGuard {
     @Subscribe
     public void onLogin(LoginEvent e) {
         if (AziGuardConfig.whitelist) {
-            if (!e.getPlayer().hasPermission("aziguard.bypass_whitelist")) {
+            if (!e.getPlayer().hasPermission(AziGuardConfig.whitelistNode)) {
                 e.setResult(ResultedEvent.ComponentResult.denied(Component.text("You are not whitelisted in this server!")));
             }
         }

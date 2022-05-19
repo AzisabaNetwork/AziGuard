@@ -44,6 +44,9 @@ public class PacketLogHandler extends ChannelDuplexHandler {
                 }
             } catch (Exception | LinkageError e) {
                 AziGuard.instance.getLogger().warn("Failed to count packet", e);
+            } catch (Error e) {
+                AziGuard.instance.getLogger().error("Fatal error while counting packet", e);
+                throw e;
             }
         }
         super.channelRead(ctx, msg);
