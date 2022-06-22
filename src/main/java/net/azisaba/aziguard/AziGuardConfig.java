@@ -17,7 +17,7 @@ public class AziGuardConfig {
     public static boolean whitelist = false;
     public static String whitelistNode = "aziguard.bypass_whitelist";
     public static boolean logPackets = false;
-    public static List<Integer> blockProtocols = Collections.emptyList();
+    public static List<Integer> blockedProtocols = Collections.emptyList();
     public static String blockedProtocolMessage = "This version is not supported. Please use (insert version here).";
 
     @SuppressWarnings("UnstableApiUsage")
@@ -36,7 +36,7 @@ public class AziGuardConfig {
                                 "whitelist: false",
                                 "whitelist-node: aziguard.bypass_whitelist",
                                 "logPackets: false",
-                                "block-protocols: []",
+                                "blocked-protocols: []",
                                 "blocked-protocol-message: \"This version is not supported. Please use (insert version here).\""
                         ),
                         StandardOpenOption.CREATE
@@ -51,7 +51,7 @@ public class AziGuardConfig {
             whitelistNode = node.getNode("whitelist-node").getString("aziguard.bypass_whitelist");
             logPackets = node.getNode("logPackets").getBoolean(false);
             try {
-                blockProtocols = node.getNode("block-protocols").getList(TypeToken.of(int.class));
+                blockedProtocols = node.getNode("blocked-protocols").getList(TypeToken.of(Integer.class));
             } catch (ObjectMappingException e) {
                 throw new RuntimeException("Failed to load block-protocols", e);
             }

@@ -72,7 +72,7 @@ public class AziGuard {
 
     @Subscribe
     public void onPreLogin(PreLoginEvent e) {
-        if (AziGuardConfig.blockProtocols.contains(e.getConnection().getProtocolVersion().getProtocol())) {
+        if (AziGuardConfig.blockedProtocols.contains(e.getConnection().getProtocolVersion().getProtocol())) {
             // blocked protocol version
             var message = LegacyComponentSerializer.legacyAmpersand().deserialize(AziGuardConfig.blockedProtocolMessage);
             e.setResult(PreLoginEvent.PreLoginComponentResult.denied(message));
