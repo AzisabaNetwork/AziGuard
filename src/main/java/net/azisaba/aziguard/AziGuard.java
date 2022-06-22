@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import com.velocitypowered.api.event.ResultedEvent;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.LoginEvent;
+import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -12,6 +13,7 @@ import net.azisaba.aziguard.connection.PacketLogHandler;
 import net.azisaba.aziguard.protocol.Protocol;
 import net.azisaba.aziguard.util.PlayerUtil;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
@@ -51,6 +53,7 @@ public class AziGuard {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent e) {
+        server.getCommandManager().register(AziGuardCommand.create());
         server.getScheduler().buildTask(this, () -> {
             if (AziGuardConfig.logPackets) {
                 List<Map.Entry<String, Long>> list = new ArrayList<>(PacketLogHandler.PACKET_COUNT.entrySet());
@@ -65,6 +68,16 @@ public class AziGuard {
                 }
             }
         }).delay(1, TimeUnit.MINUTES).repeat(1, TimeUnit.MINUTES).schedule();
+    }
+
+    @Subscribe
+    public void onPreLogin(PreLoginEvent e) {
+        if (AziGuardConfig.blockProtocols.contains(e.getConnection().getProtocolVersion().getProtocol())) {
+            // blocked protocol version
+            var message = LegacyComponentSerializer.legacyAmpersand().deserialize(AziGuardConfig.blockedProtocolMessage);
+            e.setResult(PreLoginEvent.PreLoginComponentResult.denied(message));
+            //return;
+        }
     }
 
     @Subscribe
