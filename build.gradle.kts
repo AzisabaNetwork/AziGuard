@@ -9,20 +9,21 @@ repositories {
     mavenCentral()
 
     // velocity repo
-    maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
+    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
 }
 
 dependencies {
     // velocity-api
-    compileOnly("com.velocitypowered:velocity-api:3.0.1")
-    annotationProcessor("com.velocitypowered:velocity-api:3.0.1")
+    compileOnly("com.velocitypowered:velocity-api:4.2.1-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:4.2.1-SNAPSHOT")
+    compileOnly("org.jetbrains:annotations:26.0.2")
 
     // netty
     compileOnly("io.netty:netty-all:4.1.77.Final")
 }
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(25))
 }
 
 tasks {

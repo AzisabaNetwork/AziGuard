@@ -1,9 +1,7 @@
 package net.azisaba.aziguard;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
+import org.spongepowered.configurate.ConfigurationNode;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -14,16 +12,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class AziGuardConfig {
-    public static boolean whitelist = false;
+    public static volatile boolean whitelist = false;
+    public static volatile boolean beta = false;
     public static String whitelistNode = "aziguard.bypass_whitelist";
     public static boolean logPackets = false;
     public static List<Integer> blockedProtocols = Collections.emptyList();
     public static String blockedProtocolMessage = "This version is not supported. Please use (insert version here).";
 
-    @SuppressWarnings("UnstableApiUsage")
-    public static void reload() {
-        whitelist = false;
-        logPackets = false;
+    public static synchronized void reload() {
         Path configPath = AziGuard.instance.getDataDirectory().resolve("config.yml");
         if (!Files.exists(configPath)) {
             try {
@@ -35,6 +31,7 @@ public class AziGuardConfig {
                         Arrays.asList(
                                 "whitelist: false",
                                 "whitelist-node: aziguard.bypass_whitelist",
+                                "beta: false",
                                 "logPackets: false",
                                 "blocked-protocols: []",
                                 "blocked-protocol-message: \"This version is not supported. Please use (insert version here).\""
@@ -46,17 +43,31 @@ public class AziGuardConfig {
             }
         }
         try {
-            ConfigurationNode node = YAMLConfigurationLoader.builder().setPath(configPath).build().load();
-            whitelist = node.getNode("whitelist").getBoolean(false);
-            whitelistNode = node.getNode("whitelist-node").getString("aziguard.bypass_whitelist");
-            logPackets = node.getNode("logPackets").getBoolean(false);
-            try {
-                blockedProtocols = node.getNode("blocked-protocols").getList(TypeToken.of(Integer.class));
-            } catch (ObjectMappingException e) {
-                throw new RuntimeException("Failed to load block-protocols", e);
-            }
-            blockedProtocolMessage = node.getNode("blocked-protocol-message").getString("This version is not supported. Please use (insert version here).");
-        } catch (IOException ignore) {
+            ConfigurationNode node = YamlConfigurationLoader.builder().path(configPath).build().load();
+            blockedProtocols = node.node("blocked-protocols").getList(Integer.class, Collections.emptyList());
+            whitelist = node.node("whitelist").getBoolean(false);
+            whitelistNode = node.node("whitelist-node").getString("aziguard.bypass_whitelist");
+            beta = node.node("beta").getBoolean(false);
+            logPackets = node.node("logPackets").getBoolean(false);
+            blockedProtocolMessage = node.node("blocked-protocol-message").getString("This version is not supported. Please use (insert version here).");
+        } catch (IOException ex) {
+            AziGuard.instance.getLogger().warn("Failed to load config.yml", ex);
+        }
+    }
+
+    public static synchronized void setEnabled(String key, boolean enabled) throws IOException {
+        if (!key.equals("whitelist") && !key.equals("beta")) {
+            throw new IllegalArgumentException("Unknown setting: " + key);
+        }
+        var loader = YamlConfigurationLoader.builder()
+                .path(AziGuard.instance.getDataDirectory().resolve("config.yml")).build();
+        ConfigurationNode node = loader.load();
+        node.node(key).set(enabled);
+        loader.save(node);
+        if (key.equals("whitelist")) {
+            whitelist = enabled;
+        } else {
+            beta = enabled;
         }
     }
 }

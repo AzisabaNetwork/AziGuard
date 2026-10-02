@@ -82,10 +82,13 @@ public class AziGuard {
 
     @Subscribe
     public void onLogin(LoginEvent e) {
-        if (AziGuardConfig.whitelist) {
-            if (!e.getPlayer().hasPermission(AziGuardConfig.whitelistNode)) {
-                e.setResult(ResultedEvent.ComponentResult.denied(Component.text("You are not whitelisted in this server!")));
-            }
+        if (AziGuardConfig.whitelist && !e.getPlayer().hasPermission(AziGuardConfig.whitelistNode)) {
+            e.setResult(ResultedEvent.ComponentResult.denied(Component.text("You are not whitelisted in this server!")));
+            return;
+        }
+        if (AziGuardConfig.beta && !e.getPlayer().hasPermission("aziguard.beta.join")) {
+            e.setResult(ResultedEvent.ComponentResult.denied(Component.text("You do not have permission to join the beta!")));
+            return;
         }
         try {
             PlayerUtil.getChannel(e.getPlayer())
